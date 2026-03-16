@@ -46,8 +46,30 @@ try
     mirrored_lens = mirror_lens(final_lens);
     for j = 1:layers_count
         if isempty(final_lens{j}), continue; end
-        plot(final_lens{j}(:,1),    final_lens{j}(:,2),    'k', 'LineWidth', 1.5);
-        plot(mirrored_lens{j}(:,1), mirrored_lens{j}(:,2), 'k', 'LineWidth', 1.5);
+        top = final_lens{j};
+        bot = mirrored_lens{j};
+        plot(top(:,1), top(:,2), 'k', 'LineWidth', 1.5);
+        plot(bot(:,1), bot(:,2), 'k', 'LineWidth', 1.5);
+
+        % Close the open tip (last points of each curve)
+        p_top = top(end,:);
+        p_bot = bot(end,:);
+
+        if j == 1
+            % Innermost layer: flat cap connecting the two endpoints
+            plot([p_top(1), p_bot(1)], [p_top(2), p_bot(2)], 'k', 'LineWidth', 1.5);
+        else
+            % Outer layers: extend endpoint tangents to their intersection (pointy tip)
+            dir_top  = top(end,:) - top(end-1,:);
+            angle_top = atan2d(dir_top(2), dir_top(1));
+            dir_bot  = bot(end,:) - bot(end-1,:);
+            angle_bot = atan2d(dir_bot(2), dir_bot(1));
+            tip = find_intersection(p_top, angle_top, p_bot, angle_bot);
+            if ~any(isnan(tip))
+                plot([p_top(1), tip(1)], [p_top(2), tip(2)], 'k', 'LineWidth', 1.5);
+                plot([p_bot(1), tip(1)], [p_bot(2), tip(2)], 'k', 'LineWidth', 1.5);
+            end
+        end
     end
     plot(source_pos(1), source_pos(2), 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r');
     fprintf('Plotted constructed lens.\n');
