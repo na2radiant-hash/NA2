@@ -1,4 +1,4 @@
-%% ============================================================
+﻿%% ============================================================
 %  STEP 1: LENS CONSTRUCTION
 %  180° fan + weighted bending, but STRICT collimation
 %  ============================================================
@@ -12,7 +12,7 @@ n2            = 2.003;     % Lens medium refractive index
 layers_count  = 8;       % Number of layers/surfaces to construct
 rays_count    = 10;       % Number of rays to *design* the lens with
 source_pos    = [0, 0];   % Source position
-output_filename = 'lens_data_gradual_N2003_test.mat';
+output_filename = 'lens_data_gradual_N2003.mat';
 enable_filled_overlay = false;   % toggle: true/false
 
 
@@ -50,6 +50,42 @@ try
         plot(mirrored_lens{j}(:,1), mirrored_lens{j}(:,2), 'k', 'LineWidth', 1.5);
     end
     plot(source_pos(1), source_pos(2), 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r');
+    
+   % Close the innermost crescent: connect layer 1 and layer 2 tip endpoints (top and bottom)
+    plot([final_lens{1}(end,1), final_lens{2}(end,1)], ...
+         [final_lens{1}(end,2), final_lens{2}(end,2)], 'k', 'LineWidth', 1.5);
+    plot([mirrored_lens{1}(end,1), mirrored_lens{2}(end,1)], ...
+         [mirrored_lens{1}(end,2), mirrored_lens{2}(end,2)], 'k', 'LineWidth', 1.5);
+
+% Close outer crescents (layers 3&4, 5&6, ...) with a pointy end
+    for e = 2 : floor(layers_count / 2)
+        li = 2*e - 1;   % inner layer of this element
+        lo = 2*e;       % outer layer of this element
+        if isempty(final_lens{li}) || isempty(final_lens{lo}), continue; end
+
+        % TOP side: extend endpoint tangents to intersection
+        p1 = final_lens{li}(end,:);
+        a1 = atan2d(p1(2) - final_lens{li}(end-1,2), p1(1) - final_lens{li}(end-1,1));
+        p2 = final_lens{lo}(end,:);
+        a2 = atan2d(p2(2) - final_lens{lo}(end-1,2), p2(1) - final_lens{lo}(end-1,1));
+        tip_top = find_intersection(p1, a1, p2, a2);
+        if ~any(isnan(tip_top))
+            plot([p1(1), tip_top(1)], [p1(2), tip_top(2)], 'k', 'LineWidth', 1.5);
+            plot([p2(1), tip_top(1)], [p2(2), tip_top(2)], 'k', 'LineWidth', 1.5);
+        end
+
+        % BOTTOM side (mirrored): same logic
+        p1m = mirrored_lens{li}(end,:);
+        a1m = atan2d(p1m(2) - mirrored_lens{li}(end-1,2), p1m(1) - mirrored_lens{li}(end-1,1));
+        p2m = mirrored_lens{lo}(end,:);
+        a2m = atan2d(p2m(2) - mirrored_lens{lo}(end-1,2), p2m(1) - mirrored_lens{lo}(end-1,1));
+        tip_bot = find_intersection(p1m, a1m, p2m, a2m);
+        if ~any(isnan(tip_bot))
+            plot([p1m(1), tip_bot(1)], [p1m(2), tip_bot(2)], 'k', 'LineWidth', 1.5);
+            plot([p2m(1), tip_bot(1)], [p2m(2), tip_bot(2)], 'k', 'LineWidth', 1.5);
+        end
+    end
+
     fprintf('Plotted constructed lens.\n');
         % --------------------------------------------------------
     % OPTIONAL FILLED OVERLAY (easy to disable)
@@ -154,7 +190,7 @@ function [alpha, theta_in, theta_out, gamma] = calculate_angles(L, R, n1, n2)
 
     % ------------- per-layer/per-ray weights (distribution) ------------
     J_front      = min(10, L);
-    k_shape      = 4.0;
+    k_shape      = 0.8;
     base_w       = 0.8;
     hardness_exp = 2.0;
     layer_exp    = 1.2;
