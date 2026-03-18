@@ -12,7 +12,7 @@ n2            = 2.003;     % Lens medium refractive index
 layers_count  = 8;       % Number of layers/surfaces to construct
 rays_count    = 10;       % Number of rays to *design* the lens with
 source_pos    = [0, 0];   % Source position
-output_filename = 'lens_data_gradual_N2003.mat';
+output_filename = 'lens_data_gradual_N2003_temp.mat';
 enable_filled_overlay = false;   % toggle: true/false
 
 

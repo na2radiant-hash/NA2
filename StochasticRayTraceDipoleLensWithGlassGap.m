@@ -19,7 +19,7 @@ input_filename   = 'lens_data_4_elements_with_glass.mat';
 N_rays           = 10;                   % number of rays
 seed             = 42;
 draw_mirror      = true;
-emission_profile = 'uniform';            % 'uniform' or 'sin2'
+emission_profile = 'sin2';            % 'uniform' or 'sin2'
 rng(seed);
 
 % Uniform emission params

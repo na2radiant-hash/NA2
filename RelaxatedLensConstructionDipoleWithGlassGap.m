@@ -32,15 +32,15 @@ n2            = 2.003;    % Lens medium refractive index
 layers_count  = 8;        % Number of layers/surfaces (must be even = 2*#elements)
 rays_count    = 10;      % Number of rays to *design* the lens with
 source_pos    = [0, 0];   % Source position
-output_filename = 'lens_data_4_elements_with_glass.mat';
+output_filename = 'lens_data_4_elements_no_glass.mat';
 
 % NEW: cutoff for the design fan (degrees)
-MAX_FAN_ANGLE_DEG = 150;
+MAX_FAN_ANGLE_DEG = 175;
 
 % =========================
 % NEW: Multi-glass insertion params
 % =========================
-ENABLE_GLASS = true;
+ENABLE_GLASS = false;
 
 % Can be scalar or vector (elements are 1..layers_count/2)
 glass_pos   = [];    % insert glass BEFORE these elements (e.g. [2 3 4])
